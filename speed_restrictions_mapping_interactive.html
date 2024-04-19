@@ -13,22 +13,24 @@
             .return {
                 display: flex;
                 justify-content:  center;
-                border: 16px solid blue;
+                border: 8px solid blue;
                 position: relative;
-                border-radius: 6px;
+                border-radius: 3px;
                 background-color: #fff;
             }
             .return::before {
                 content: "";
                 position: absolute;
-                top:-12px;
-                right: -12px;
-                left: -12px;
-                bottom: -12px;
-                border: 8px dotted white;
+                top:-6px;
+                right: -6px;
+                left: -6px;
+                bottom: -6px;
+                border: 4px dotted white;
             }
             a {
                 text-decoration: none;
+                z-index: 100;
+                position: relative;
             }
     </style>
     <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
