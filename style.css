@@ -210,3 +210,14 @@ main {
     padding: 50px 50px 50px 50px;
     margin: 0.5rem;
 }
+
+img {
+    height: 600px;
+    /* margin-top: 10px;
+    margin-bottom: 10px; */
+}
+
+#vis5 {
+    padding-right: 0;
+    display: flex;
+}

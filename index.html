@@ -389,153 +389,7 @@
             Our second visualization is a stacked area plot that explores the speed restrictions data set. The height of the combined bars represents the total number of speed restrictions that have been opened in 2023 before or on that date. For example, by the end of 2023, almost 700 total speed restrictions had been opened over the course of the year. The height of the yellow area is the number of active restrictions on a given day, while the height of the blue bar is the number of closed restrictions. For example, there were just under 200 active restrictions remaining by the end of 2023, while there were over 500 that had been closed by then. 
         </p>
         <div class = "visual_content">
-        <div id="areaplot"></div>
-        <script src='https://d3js.org/d3.v7.min.js'></script>
-        <script>
-            const daily = d3.csv("daily_counts.csv");
-
-            // Once the data is loaded, proceed with plotting
-            daily.then(function(data) {
-                // Convert string values to numbers
-                data.forEach(function(d) {
-                    d.index = new Date(d.index);;
-                    d.active = +d.active;
-                    d.net_closed = +d.net_closed
-                });
-
-                // Set up SVG dimensions
-                var margin = {top: 60, right: 150, bottom: 60, left: 70},
-                    width = 1000 - margin.left - margin.right,
-                    height = 500 - margin.top - margin.bottom;
-
-                // Create SVG container
-                var svg = d3.select("#areaplot").append("svg")
-                    .attr("width", width + margin.left + margin.right)
-                    .attr("height", height + margin.top + margin.bottom)
-                .append("g")
-                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-                // Define color scales
-                var colorScale = d3.scaleOrdinal()
-                    .domain(["active", "net_closed"])
-                    .range(["#FFC20A", "#0C7BDC"]);
-
-                // Define x and y scales
-                var x = d3.scaleTime()
-                    .domain(d3.extent(data, function(d) { return d.index; }))
-                    .range([0, width]);
-
-                var y = d3.scaleLinear()
-                    .domain([0, 700]) // Adjust the domain for stacked area
-                    .range([height, 0]);
-
-                // Define area generators for both variables
-                var areaCount = d3.area()
-                    .x(function(d) { return x(d.index); })
-                    .y0(height)
-                    .y1(function(d) { return y(d.active); });
-
-                var areaCleared = d3.area()
-                    .x(function(d) { return x(d.index); })
-                    .y0(function(d) { return y(d.active); }) // Stack on top of 'count'
-                    .y1(function(d) { return y(d.active + d.net_closed); });
-
-                // Append areas for 'count' and 'cleared'
-                svg.append("path")
-                    .datum(data)
-                    .attr("class", "area")
-                    .style("fill", colorScale("active"))
-                    .attr("d", areaCount);
-
-                svg.append("path")
-                    .datum(data)
-                    .attr("class", "area")
-                    .style("fill", colorScale("net_closed"))
-                    .attr("d", areaCleared);
-
-
-                // Add y axis
-                svg.append("g")
-                    .call(d3.axisLeft(y));
-
-                // Style and customize as needed
-
-                // Add legend title
-                svg.append("text")
-                    .attr("x", width + 10)
-                    .attr("y", -5)
-                    .attr("text-anchor", "start")
-                    .style("font", "12px sans-serif")
-                    .text("Restriction Type");
-
-                // Add legend
-                var legend = svg.selectAll(".legend")
-                .data(["Active", "Closed"]) // Updated legend labels
-                .enter().append("g")
-                .attr("class", "legend")
-                .attr("transform", function(d, i) { return "translate(" + (width + 10) + "," + (i * 20 + 10) + ")"; });
-
-                legend.append("rect")
-                    .attr("x", 0)
-                    .attr("width", 18)
-                    .attr("height", 18)
-                    .style("fill", colorScale);
-
-                legend.append("text")
-                    .attr("x", 22)
-                    .attr("y", 9)
-                    .attr("dy", ".35em")
-                    .style("text-anchor", "start")
-                    .style("font", "10px sans-serif") // Set font size and family
-                    .text(function(d) { return d; }); // Display legend label based on data
-
-                svg.append("text")
-                    .attr("transform", "translate(" + (width / 2) + " ," + (height + 40) + ")") // Position the label at the bottom center
-                    .style("text-anchor", "middle")
-                    .style("font", "12px sans-serif")
-                    .text("Month", );
-
-                svg.append("text")
-                    .attr("transform", "translate(" + 0 + " ," + (-25) + ")")
-                    .style("text-anchor", "left")
-                    .style("font", "18px sans-serif")
-                    .text("Active and Closed Restrictions Throughout 2023", );
-
-                svg.append("text")
-                    .attr("transform", "rotate(-90)")
-                    .attr("y", 20 - margin.left)
-                    .attr("x", 0 - (height / 2))
-                    .attr("dy", "1em")
-                    .style("text-anchor", "middle")
-                    .style("font", "12px sans-serif")
-                    .text("Total Speed Restrictions Count");
-
-                
-
-                // Add gridlines for y-axis
-                svg.append("g")
-                    .attr("class", "grid")
-                    .call(d3.axisLeft(y)
-                        .tickSize(-width)
-                        .tickValues(d3.range(0, 750, 100)) // Set tick values to intervals of 100 up to maxYAdjusted
-                        .tickFormat(""))
-                    .selectAll("line")
-                    .style("stroke", "#ccc"); 
-
-                    // Add x axis
-                svg.append("g")
-                .attr("transform", "translate(0," + height + ")")
-                .call(d3.axisBottom(x)
-                    .tickFormat(d3.timeFormat("%B"))); // Customize tick labels to display month names
-
-                // Add y axis
-                svg.append("g")
-                    .call(d3.axisLeft(y));
-
-            
-            });
-
-        </script>
+        <img src="stacked_area_d3.png", id="stacked_area">
         </div>
         <p>
             This plot helped us have an understanding on the prevalence of speed restrictions over the course of the year. One thing that jumped out to us at first was the steep jump in active restrictions that happened in March, going from about 100 active restrictions to over 300 in a matter of a few weeks. After doing some research, we found that this was the case after a <a href="https://cdn.mbta.com/sites/default/files/2023-03/20230310_qco_dpu_priority-1-conditions.pdf">Red Line inspection</a> by the Department of Public Utilities determined that the track required these restrictions as a precaution. Besides that one aberration, we observed that the MBTA did a good job with maintaining a fairly steady number of 300-ish active restrictions throughout the rest of the year, and even dipping down to below 200 by the year's end. This visualization suggests that, over the course of 2023, speed restrictions were a fairly common issue across the system, so riders likely became very familiar with the service patterns of the agency. 
@@ -561,125 +415,7 @@
             Our fourth visualization is a horizontal bar chart that shows the decrease in station entries for each station from their pre-COVID totals to their 2023 numbers. In other words, a longer bar means that that station has seen a smaller percentage of their riders return after COVID than a shorter line. For example, Lechmere, which has the longest bar, has lost almost 70% of it's pre-COVID riders, compared to Airport, which is only at about a 5% decrease. For this chart, we measured each difference using average ridership instead of total ridership. This accounted for any stations that underwent closures in 2023, and allowed us to directly compare one year (2023) with several (2016-2019). Each bar is also colored by the line color that the station is on, in order to detect trends across lines, as well as across stations. 
         </p>
         <div class = "visual_content">
-        <div id = "barchart"></div>
-        <script src='https://d3js.org/d3.v7.min.js'></script>
-        <script>
-            //Define data
-            const trains = d3.csv("pct_diff.csv");
-
-            trains.then(function(data) {
-            // Convert string values to numbers
-
-            
-            data.forEach(function(d) {
-                d.pct_diff = +d.pct_diff * -1;
-            });
-            data.sort((a, b) => b.pct_diff - a.pct_diff);
-
-            // Set up dimensions for the chart
-            var margin = {top: 60, right: 30, bottom: 50, left: 150},
-            width = 800 - margin.left - margin.right,
-            height = 900 - margin.top - margin.bottom;
-
-            // Append SVG to the body
-            var svg = d3.select("#barchart").append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-            // Sort data based on pct_diff
-            data.sort(function(a, b) { return a.pct_diff - b.pct_diff; });
-
-            // Define scales
-            var x = d3.scaleLinear()
-            .domain([0, d3.max(data, function(d) { return d.pct_diff; })])
-            .range([0, width]);
-
-            var y = d3.scaleBand()
-            .domain(data.map(function(d) { return d.station_name; }))
-            .range([0, height])
-            .padding(0.1);
-
-            var color = d3.scaleOrdinal()
-                .domain(["Blue Line", "Green Line", "Orange Line", "Red Line"])
-                .range(["#003DA5", "#00843D", "#ED8B00", "#DA291C"]);
-
-
-            // Add bars
-            svg.selectAll(".bar")
-            .data(data)
-            .enter().append("rect")
-            .attr("class", "bar")
-            .attr("x", function(d) { return Math.min(x(0), x(d.pct_diff)); })
-            .attr("y", function(d) { return y(d.station_name); })
-            .attr("width", function(d) { return Math.abs(x(d.pct_diff) - x(0)); })
-            .attr("height", y.bandwidth())
-            .style("fill", function(d) { return color(d.route_or_line); });
-
-            
-
-            // Add x-axis
-            svg.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(x));
-
-            // Add y-axis
-            svg.append("g")
-            .attr("class", "y axis")
-            .call(d3.axisLeft(y));
-
-            // Add labels
-            svg.append("text")
-            .attr("class", "x label")
-            .attr("text-anchor", "middle")
-            .style('font-family', 'sans-serif')
-            .attr("x", width/2)
-            .attr("y", height + 40)
-            .style("font", "15px sans-serif") 
-            .text("Percentage Decrease");
-
-            svg.append("text")
-                .attr("transform", "translate(" + -140 + " ," + -20 + ")")
-                .style("text-anchor", "left")
-                .style("font", "18px sans-serif")
-                .text("Percentage Decrease in Average Ridership from Pre-COVID to 2023 Colored by Line", );
-
-
-            // Add legend title
-            svg.append("text")
-            .attr("x", width - 100)
-            .attr("y", +32)
-            .attr("text-anchor", "start")
-            .style("font", "13px sans-serif")
-            .text("MBTA Line");
-
-            // Add legend
-            var legend = svg.selectAll(".legend")
-            .data(["Blue", "Green", "Orange", "Red"]) // Updated legend labels
-            .enter().append("g")
-            .attr("class", "legend")
-            .attr("transform", function(d, i) { return "translate(" + (width - 100) + "," + (i * 20 + 40) + ")"; });
-
-
-            legend.append("rect")
-            .attr("x", 0)
-            .attr("width", 18)
-            .attr("height", 18)
-            .style("fill", color);
-
-            legend.append("text")
-            .attr("x", 22)
-            .attr("y", 9)
-            .attr("dy", ".35em")
-            .style("text-anchor", "start")
-            .style("font", "12px sans-serif") // Set font size and family
-            .text(function(d) { return d; }); // Display legend label based on data
-
-
-            });
-        </script>
+        <img src="barchart_d3.png", id=barchart>
         </div>
         <p>
             Our main takeaways from this graph have to do with the grouping of stations along the same line. For instance, the top 7 lines and 9 of the top 11 in terms of least decreased ridership are all Blue Line stations. On the other hand, with the exception of Lechmere, 9 of the 10 stations with the greatest decreases in ridership are on the Red Line. These results generally corroborate our findings from previous visualizations. In visualization 1, we observed that different stations have all rebounded from COVID differently, which is supported with this visualization. Originally, we had hypothesized that geographic or demographic diversity may play a role in ridership differences, which is supported here, with the trends you see among Blue and Red Line riders. Additionally, we learned from the second visualization that a significant number of speed restrictions were opened in March due to issues with the Red Line. In this visualzation, we see that Red Line riders are the least likely to have returned to the MBTA after COVID, which may suggest that there is a correlation between amount of restrictions and number of riders. 
@@ -690,8 +426,26 @@
         <p> 
             The following visualization is an examination of an individual speed restriction, specifically, one that affected the Arlington, Copley, and Boylston stations in the Eastbound direction from June 14, 2023 to December 5, 2023. These three stacked line charts show the ridership for all three stations in the Eastbound direction, averaged over each day of the week. As can be seen below, weekends clearly have lower ridership. Each line represents a different time-frame and are as follows: average ridership during 2018, average ridership during 2023 while the speed restriction was active (6/14 - 12/5), average ridership during 2023 when the speed restriction was not active, and finally, average ridership during the 2020 COVID-19 lockdown (3/15 - 7/1).
         </p>
-        <div class="visual_content">
-        <p>Put the individual speed restriction visualization here</p>
+        <div class="visual_content", id="vis5">
+            <script>
+                (function(vegaEmbed) {
+                  var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}, "title": {"align": "center", "anchor": "middle"}}, "vconcat": [{"hconcat": [{"mark": {"type": "line"}, "encoding": {"color": {"field": "dataset", "type": "nominal"}, "x": {"axis": {"labelExpr": "dayAbbrevFormat(datum.value)", "title": "Day of the Week"}, "field": "day_of_week", "type": "quantitative"}, "y": {"field": "am_rush_avg", "scale": {"domain": [0, 8900.0]}, "title": "Avg. Station Entries", "type": "quantitative"}}, "height": 190, "title": "AM Rush", "width": 190}, {"mark": {"type": "line"}, "encoding": {"color": {"field": "dataset", "title": "Dataset Timeframe", "type": "nominal"}, "x": {"axis": {"labelExpr": "dayAbbrevFormat(datum.value)", "title": "Day of the Week"}, "field": "day_of_week", "type": "quantitative"}, "y": {"field": "pm_rush_avg", "scale": {"domain": [0, 8900.0]}, "title": "Avg. Station Entries", "type": "quantitative"}}, "height": 190, "width": 190}, {"mark": {"type": "line"}, "encoding": {"color": {"field": "dataset", "type": "nominal"}, "x": {"axis": {"labelExpr": "dayAbbrevFormat(datum.value)", "title": "Day of the Week"}, "field": "day_of_week", "type": "quantitative"}, "y": {"field": "full_day_avg", "scale": {"domain": [0, 8900.0]}, "title": "Avg. Station Entries", "type": "quantitative"}}, "height": 190, "title": "Full Day", "width": 190}]}], "data": {"name": "data-adfef609e31727b2e42dc072f82ac8ae"}, "title": {"text": "Average Gated Station Entries for Copley, Boylston, Arlington between 6/14 and 12/5", "anchor": "middle", "fontSize": 16}, "$schema": "https://vega.github.io/schema/vega-lite/v5.16.3.json", "datasets": {"data-adfef609e31727b2e42dc072f82ac8ae": [{"Unnamed: 0": 0, "day_of_week": 1, "am_rush_avg": 1105.08, "pm_rush_avg": 4064.213333333333, "full_day_avg": 7639.44, "dataset": "2018 Average"}, {"Unnamed: 0": 1, "day_of_week": 2, "am_rush_avg": 1210.24, "pm_rush_avg": 4380.493333333333, "full_day_avg": 8370.266666666666, "dataset": "2018 Average"}, {"Unnamed: 0": 2, "day_of_week": 3, "am_rush_avg": 1191.72, "pm_rush_avg": 4240.746666666667, "full_day_avg": 8411.013333333334, "dataset": "2018 Average"}, {"Unnamed: 0": 3, "day_of_week": 4, "am_rush_avg": 1176.493333333333, "pm_rush_avg": 4181.5199999999995, "full_day_avg": 8239.44, "dataset": "2018 Average"}, {"Unnamed: 0": 4, "day_of_week": 5, "am_rush_avg": 1106.5866666666668, "pm_rush_avg": 4023.013333333334, "full_day_avg": 8405.199999999999, "dataset": "2018 Average"}, {"Unnamed: 0": 5, "day_of_week": 6, "am_rush_avg": 531.2133333333334, "pm_rush_avg": 2616.6266666666666, "full_day_avg": 5986.52, "dataset": "2018 Average"}, {"Unnamed: 0": 6, "day_of_week": 0, "am_rush_avg": 425.5733333333333, "pm_rush_avg": 2179.306666666667, "full_day_avg": 4764.706666666667, "dataset": "2018 Average"}, {"Unnamed: 0": 0, "day_of_week": 1, "am_rush_avg": 568.5288888888889, "pm_rush_avg": 1980.84, "full_day_avg": 4024.56388888889, "dataset": "Average During Restriction"}, {"Unnamed: 0": 1, "day_of_week": 2, "am_rush_avg": 646.7053140096618, "pm_rush_avg": 2375.572463768116, "full_day_avg": 4639.932367149759, "dataset": "Average During Restriction"}, {"Unnamed: 0": 2, "day_of_week": 3, "am_rush_avg": 672.2777777777777, "pm_rush_avg": 2485.930555555555, "full_day_avg": 4902.347222222222, "dataset": "Average During Restriction"}, {"Unnamed: 0": 3, "day_of_week": 4, "am_rush_avg": 658.7916666666666, "pm_rush_avg": 2372.555555555555, "full_day_avg": 4839.166666666667, "dataset": "Average During Restriction"}, {"Unnamed: 0": 4, "day_of_week": 5, "am_rush_avg": 582.3227777777778, "pm_rush_avg": 2175.7516666666666, "full_day_avg": 4790.263333333333, "dataset": "Average During Restriction"}, {"Unnamed: 0": 5, "day_of_week": 6, "am_rush_avg": 350.7916666666667, "pm_rush_avg": 1947.138888888889, "full_day_avg": 4272.486111111111, "dataset": "Average During Restriction"}, {"Unnamed: 0": 6, "day_of_week": 0, "am_rush_avg": 306.56637681159424, "pm_rush_avg": 1771.4307246376811, "full_day_avg": 3750.728115942029, "dataset": "Average During Restriction"}, {"Unnamed: 0": 0, "day_of_week": 1, "am_rush_avg": 105.85416666666669, "pm_rush_avg": 234.16666666666663, "full_day_avg": 569.2916666666666, "dataset": "Average During COVID Lockdown"}, {"Unnamed: 0": 1, "day_of_week": 2, "am_rush_avg": 98.52083333333331, "pm_rush_avg": 227.6875, "full_day_avg": 543.8333333333334, "dataset": "Average During COVID Lockdown"}, {"Unnamed: 0": 2, "day_of_week": 3, "am_rush_avg": 96.91666666666669, "pm_rush_avg": 231.3125, "full_day_avg": 549.375, "dataset": "Average During COVID Lockdown"}, {"Unnamed: 0": 3, "day_of_week": 4, "am_rush_avg": 95.42222222222222, "pm_rush_avg": 206.86666666666667, "full_day_avg": 514.1111111111112, "dataset": "Average During COVID Lockdown"}, {"Unnamed: 0": 4, "day_of_week": 5, "am_rush_avg": 94.0, "pm_rush_avg": 214.8, "full_day_avg": 538.8000000000001, "dataset": "Average During COVID Lockdown"}, {"Unnamed: 0": 5, "day_of_week": 6, "am_rush_avg": 61.06666666666666, "pm_rush_avg": 141.95555555555555, "full_day_avg": 377.6222222222222, "dataset": "Average During COVID Lockdown"}, {"Unnamed: 0": 6, "day_of_week": 0, "am_rush_avg": 52.729166666666664, "pm_rush_avg": 149.875, "full_day_avg": 377.5625, "dataset": "Average During COVID Lockdown"}, {"Unnamed: 0": 0, "day_of_week": 1, "am_rush_avg": 495.5117845117845, "pm_rush_avg": 1724.0589225589226, "full_day_avg": 3565.3653198653196, "dataset": "2023 Average w/o Restrictions"}, {"Unnamed: 0": 1, "day_of_week": 2, "am_rush_avg": 592.6060606060606, "pm_rush_avg": 2328.126262626263, "full_day_avg": 4493.220538720539, "dataset": "2023 Average w/o Restrictions"}, {"Unnamed: 0": 2, "day_of_week": 3, "am_rush_avg": 610.4284511784512, "pm_rush_avg": 2384.5622895622896, "full_day_avg": 4634.835858585859, "dataset": "2023 Average w/o Restrictions"}, {"Unnamed: 0": 3, "day_of_week": 4, "am_rush_avg": 618.1957671957672, "pm_rush_avg": 2334.8518518518517, "full_day_avg": 4691.824074074074, "dataset": "2023 Average w/o Restrictions"}, {"Unnamed: 0": 4, "day_of_week": 5, "am_rush_avg": 538.7484126984126, "pm_rush_avg": 2011.7148148148144, "full_day_avg": 4508.179894179894, "dataset": "2023 Average w/o Restrictions"}, {"Unnamed: 0": 5, "day_of_week": 6, "am_rush_avg": 350.1563492063492, "pm_rush_avg": 1918.731746031746, "full_day_avg": 4255.743650793651, "dataset": "2023 Average w/o Restrictions"}, {"Unnamed: 0": 6, "day_of_week": 0, "am_rush_avg": 256.85016835016836, "pm_rush_avg": 1504.8131313131314, "full_day_avg": 3163.6329966329963, "dataset": "2023 Average w/o Restrictions"}]}};
+                  var embedOpt = {"mode": "vega-lite"};
+            
+                  function showError(el, error){
+                      el.innerHTML = ('<div style="color:red;">'
+                                      + '<p>JavaScript Error: ' + error.message + '</p>'
+                                      + "<p>This usually means there's a typo in your chart specification. "
+                                      + "See the javascript console for the full traceback.</p>"
+                                      + '</div>');
+                      throw error;
+                  }
+                  const el = document.getElementById('vis5');
+                  vegaEmbed("#vis5", spec, embedOpt)
+                    .catch(error => showError(el, error));
+                })(vegaEmbed);
+            
+              </script>
         </div>
         <p>
             Before making this visualization, we expected the speed restrictions to have a large impact on ridership, but this was not the case across all speed restrictions. The impact of the COVID-19 lockdown on ridership is very evident in this visualization, but the impact of the speed restrictions are negligable across all three ridership totals. After taking these findings into consideration, we revised our hypothesis to better reflect human behavior and the story the data visualization was telling.
